@@ -1,6 +1,6 @@
 # Introduction to Lean
 
-auther: Ray Zhan		 email : ray1710852730@163.com 
+author: Ray Zhan		 email : ray1710852730@163.com 
 
 
 
