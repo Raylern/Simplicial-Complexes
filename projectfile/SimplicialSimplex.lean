@@ -29,8 +29,8 @@ class Simplex where
 -- def Simplex (V : Type _) : Type _ := Finset V
 
 -- def(dimension of a AS) : cardinality 
-def dimension {V : Type _} (K : Simplex V) : ℕ := Finset.card K.elems
-/- def dimension (K : Simplex) : ℕ := Finset.card K.elems -/
+def dimension {V : Type _} (K : Simplex V) : ℕ := Finset.card K.elems - 1
+/- def dimension (K : Simplex) : ℕ := Finset.card K.elems - 1 -/
 
 -- example_1 (simplexes)
 instance edge12 : Simplex ℕ where
@@ -47,7 +47,7 @@ instance point2 : Simplex ℕ where
   elems := {2} 
   -- non_empty := by simp
 
-example : dimension point1 = 1 := by
+example : dimension point1 = 0 := by
   simp
 -- end of example_1
 
