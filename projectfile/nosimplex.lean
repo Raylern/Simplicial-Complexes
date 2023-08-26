@@ -31,7 +31,6 @@ variable (V: Type _) (X: Set (Finset V))
 
 class Simplex (V : Type _) where 
   s : Finset V
-  -- non_empty : s ≠∅  
 
 #check Simplex
 
@@ -44,18 +43,15 @@ def dimension {V : Type _} (K : Finset V) : ℕ := Finset.card K - 1
 -- example_1 (simplexes)
 instance edge12 : Simplex ℕ where
   s := {1,2}
-  -- non_empty := by simp
 
 #check edge12
 #print edge12
 
 instance point1 : Simplex ℕ where
-  s := {1}   
-  -- non_empty := by simp
+  s := {1} 
 
 instance point2 : Simplex ℕ where
   s := {2} 
-  -- non_empty := by simp
 
 example : dimensionsmplx point1 = 0 := by
   simp
@@ -188,37 +184,76 @@ instance realline : AbstractSimplicialCplx Lℤ where
    simp
   -- end of example_3
 
-lemma face_dim_le {V : Type _} (K K' : Simplex V) (h: dimensionsmplx K = n) (k: face K K') : dimensionsmplx K' ≤ n := by sorry  
+lemma face_dim_le {V : Type _} (K K' : Simplex V) (h: dimensionsmplx K = n) (k: face K K') : dimensionsmplx K' ≤ n := by 
+ unfold dimensionsmplx at *
+ unfold face at k 
+ have le: Finset.card K'.s ≤ Finset.card K.s := by exact Finset.card_le_of_subset k 
+ simp at *
+ have h1 : Finset.card K.s = n + 1 := by sorry
+ linarith
+  
+
+
+
+-- def(skeleton) : a collection of simplexes modified version
+ 
+def nskeleton {V : Type _} (X: Set (Finset V)) (n : ℕ):= {K | (K∈ X)∧(dimension K ≤ n)} 
+
+
+section
+
+-- lemma(n-skeleton is a simplicial complex) modified version
+instance n_skeleton {V : Type _}(X : Set (Finset V)) (h : AbstractSimplicialCplx X) : AbstractSimplicialCplx (nskeleton X n) where  
+  singletonInclusion := by 
+   unfold nskeleton
+   intro p
+   constructor
+   rcases h with ⟨h1, _, _⟩
+   specialize h1 p
+   assumption
+
+   unfold dimension
+   simp
+
+  
+  FaceInclusion := by
+   intro K
+   intro k 
+   unfold nskeleton at *
+   simp at *
+   rcases k with ⟨k1,k2⟩
+   intro K'
+   intro _ne
+   intro s
+   constructor
+   rcases h with ⟨_, h2, _⟩
+   specialize h2 K
+   simp [k1] at h2
+   specialize h2 K'
+   simp [_ne,s] at h2
+   assumption
+
+   have le: Finset.card K' ≤ Finset.card K := by exact Finset.card_le_of_subset s
+   unfold dimension at *
+   simp at *
+   linarith
+  
+  
+  NoEmpty := by 
+   unfold nskeleton
+   simp
+   unfold dimension
+   simp
+   exact h.NoEmpty
 
 
 /-
--- def(skeleton) : a collection of simplexes modified version
-variable (V : Type _) (X: Set (Finset V)) (_ : AbstractSimplicialCplx X) (n : ℕ) 
-def nskeleton: Set (Finset V)
-  := {K | (K∈ X)∧(dimension K ≤ n)}
-
--- variable (n : ℕ)
-#check nskeleton 
-
-
-
--- lemma(n-skeleton is a simplicial complex) modified version
-instance n_skeleton : AbstractSimplicialCplx nskeleton X n where :=
-
-instance n_skeleton {V : Type _} {X : Set (Finset V)} (h: AbstractSimplicialCplx X) (n : ℕ) :  AbstractSimplicialCplx Xn where
-  -- X := nskeleton X n 
-  singletonInclusion := by sorry
-  FaceInclusion := sorry
-  NoEmpty := sorry
-
-
-
 lemma clique_1_skeleton {V : Type _} {X : Set (Finset V)} (h: AbstractSimplicialCplx X) : Prop := by sorry
   -- to be continue
   -- maybe an instance of a full graph
 
 
--- def(maximum element)
+-- def(maximal element)
 def max_elem {V : Type _} {X : Set (Finset V)} {h: AbstractSimplicialCplx X} (K : Finset V) (_: K ∈ X) : Prop 
   := (∀ K'∈ X, (K ⊂ K') → false)
   #check max_elem
