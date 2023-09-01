@@ -10,6 +10,43 @@ Todo :
     
     -[] simplicial homology
 
+## Definitions and Theorems
+- Simplex
+  - dimension
+
+  (example 1, simplex and dimension)
+    
+  - face
+  - proper_face
+
+  (example 2, faces)
+
+  **theorems**
+  - dimension of a face is $\le$ dimension of simplex
+  - dimension of a face is $\lt$ dimension of simplex
+  - \# of faces of an n-dim simplex is $2^{(n+1)}$
+  - \# of faces of dimesion i of an n-dim simplex is $(^{n+1}_{i+1})$
+ 
+- (Abstract) Simplicial Complex
+
+  (example 3, realline)
+  
+  - simplex viewed as complex
+  - n skeleton
+  - simple graph corresponding to 1 skeleton of a complex
+ 
+  **theorems**
+  - 1 skeleton of a simplex (viewed as complex) is a clique
+ 
+- maximal element in a simplicial complex
+- free face of a simplicial complex
+
+  (example 4, maximal element and free face in realline)
+
+  **theorems**
+  - If a free face K exists and M is the corresponding maximal element, dim K = dim M - 1
+     
+
 ## Acknowledgement
 
 Thanks Clara L¨oh for the note
