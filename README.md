@@ -16,4 +16,4 @@ Thanks Clara L¨oh for the note
 
 Thanks to my supervisor Suraj
 
-Thanks to my teammates Ray ZHan, Ziqi Wang, Jiao Huang, Yui Dai 
+Thanks to my teammates Ray Zhan, Ziqi Wang, Jiao Huang, Yui Dai 
