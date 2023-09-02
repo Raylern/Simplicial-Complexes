@@ -1,3 +1,17 @@
+/-
+Copyright (c) 2023 Summer Project Team 6, 2023 Technion   All rights reserved
+Released under MIT license as described in the file LICENSE.
+Authors: Ray Zhan, Suraj K.
+
+! This file contains 2 part, one was implemented by 2023 Summer Project Team 6 originally, 
+! and another one was ported from Lean 3 material written by ....
+! leanprover-community/mathlib commit <not-yet there>
+! Please do not edit these lines, except to modify the commit id
+! if you have ported upstream changes. <not yet>
+-/
+
+
+
 /- imports -/
 import Mathlib.Tactic
   -- For tactics
@@ -30,6 +44,32 @@ import Mathlib.Combinatorics.SimpleGraph.Clique
     -- used to prove lemma one_skeleton_of_simplex_is_clique
   
 /- end of imports -/
+
+
+/-!
+# Abstract Simplicial Complex
+
+In this file we introduce 
+  - Abstract Simplicial Complex
+
+a concepts in Geometric Topology
+
+## Main results
+
+<TO BE Defined>
+
+## Notation
+
+ - `K` usually stands for simplex
+ - `X` usually stands for complex
+ - `f` usually stands for a face
+
+## References
+
+See [<not-yet>] for the original account on Xyzzyology.
+
+
+-/
 
 
 /- Auxiliary theorems -/
@@ -85,7 +125,7 @@ statement : {x,y}≠∅
 used in : not used
 Remark: having it because of meta Type used and Lean can't do it automatically
 -/
-theorem two_set_non_empty {V: Type _} (x y : V) {xyneq : x ≠ y}: (⟨{x,y},(by simp [xyneq])⟩ :Finset V) ≠ ∅ := by
+theorem two_set_non_empty {α : Type _} (x y : α) {xyneq : x ≠ y}: (⟨{x,y},(by simp [xyneq])⟩ :Finset α) ≠ ∅ := by
   intro h
   have eq_card: Finset.card ⟨{x,y},(by simp [xyneq])⟩ = Finset.card ∅
   · rw [h]
@@ -96,7 +136,7 @@ statement : {x,y}≠{a}
 used in : example::(no free face in realline) when proving {n}⊂{n,n+1} (used implicitly)
 Remark: having it because of meta Type used and Lean can't do it automatically
 -/
-theorem two_set_non_singleton {V: Type _} (x y : V) {xyneq : x ≠ y}: ∀ (a:V), (⟨{x,y},(by simp [xyneq])⟩ :Finset V) ≠ ({a}:Finset V):= by
+theorem two_set_non_singleton {α : Type _} (x y : α) {xyneq : x ≠ y}: ∀ (a:α), (⟨{x,y},(by simp [xyneq])⟩ :Finset α) ≠ ({a}:Finset α):= by
   intro a h
   have eq_card: Finset.card ⟨{x,y},(by simp [xyneq])⟩ = Finset.card {a}
   · rw [h]
@@ -106,7 +146,7 @@ theorem two_set_non_singleton {V: Type _} (x y : V) {xyneq : x ≠ y}: ∀ (a:V)
 statement : ⊂ + ⊆ => ⊂  
 used in : lemma unique_simplex_is_maximal, lemma free_face_max_len
 -/
-theorem trans_lt_le_imp_lt {V: Type _} {p q r: Finset V} : p⊂q → q⊆r → p⊂r := by
+theorem trans_lt_le_imp_lt {α : Type _} {p q r: Finset α} : p⊂q → q⊆r → p⊂r := by
   intro spq qr
   -- exact (trans spq qr) -- this don't work
   constructor
@@ -131,7 +171,7 @@ theorem diff_pred_eq_diff (p q: ℕ) (p_nz : p ≠ 0) (q_nz : q ≠ 0) : p.pred 
 statement : superset of a non-empty set is non-empty
 used in : lemma free_face_codim_one
 -/
-theorem superset_nonempty {V : Type _} (S S': Finset V) (h: S≠∅) (s : S⊆S') : S'≠ ∅ := by
+theorem superset_nonempty {α : Type _} (S S': Finset α) (h: S≠∅) (s : S⊆S') : S'≠ ∅ := by
   intro S'_empty
   rw [S'_empty] at s
   exact h (Finset.subset_empty.1 s)
@@ -149,23 +189,23 @@ namespace AbsSCplx
   /-
     remark : we allow empty simplex and assume non-emptiness in some theorems required
   -/
-def Simplex (V : Type _) : Type _ := Finset V
+def Simplex (α : Type _) : Type _ := Finset α 
 
 -- type coersion between simplex and finset
-instance toFinset : Coe (Simplex V) (Finset V) where
+instance toFinset : Coe (Simplex α) (Finset α) where
   coe x := x
 
-instance toSimplex : Coe (Finset V) (Simplex V) where
+instance toSimplex : Coe (Finset α) (Simplex α) where
   coe x := x
 
-instance toSetofSet : Coe (Set (Finset V)) (Set (Set V)) where
+instance toSetofSet : Coe (Set (Finset α)) (Set (Set α)) where
   coe x := x
 
 #check Simplex ℕ
 
 -- def(dimension of a AS) : cardinality of a finite set
 -- @[simp]
-def dimension {V : Type _} (K : Simplex V) : ℕ := (Finset.card K).pred
+def dimension {α : Type _} (K : Simplex α) : ℕ := (Finset.card K).pred
 
 
 
@@ -204,20 +244,20 @@ def emp : Simplex ℤ := ⟨∅,(by simp)⟩
     remark : all_faces is define to facilitate proving
   -/ 
 @[simp]
-def face {V : Type _} (K : Finset V) (f : Finset V) := f ⊆ K
+def face {α : Type _} (K : Finset α) (f : Finset α) := f ⊆ K
 
 @[simp]
-def proper_face {V : Type _} (K : Finset V) (f : Finset V) := f ⊂ K
+def proper_face {α : Type _} (K : Finset α) (f : Finset α) := f ⊂ K
 
 @[simp]
-def all_faces {V : Type _} (K : Finset V) : Finset (Finset V) := (Finset.powerset K)
+def all_faces {α : Type _} (K : Finset α) : Finset (Finset α) := (Finset.powerset K)
 -- def all_faces {V : Type _} (K : Finset V) : Finset (Finset V) := (Finset.powerset K) \ {K} 
 
 @[simp]
-def all_faces_of_dim_i {V : Type _} (K : Finset V) (i:ℕ) : Finset (Finset V) := (Finset.powersetLen (i+1) K)
+def all_faces_of_dim_i {α : Type _} (K : Finset α) (i:ℕ) : Finset (Finset α) := (Finset.powersetLen (i+1) K)
 
 -- lemma(helps to prove some simplex is a faces)
-lemma is_face {V : Type _} (K : Simplex V) (f : Simplex V) : face K f ↔ ↑f ∈ (all_faces K) := by
+lemma is_face {α : Type _} (K : Simplex α) (f : Simplex α) : face K f ↔ ↑f ∈ (all_faces K) := by
   simp only [face, all_faces, Finset.mem_powerset]
 
 
@@ -235,7 +275,7 @@ def set12 : Finset ℤ := {1,2}
 
 
 -- lemma(dimension of a face is less than the dim of simplex)
-lemma face_dim_le {V : Type _} (K : Simplex V) (f : Simplex V) (h: face K f): dimension f ≤ dimension K := by
+lemma face_dim_le {α : Type _} (K : Simplex α) (f : Simplex α) (h: face K f): dimension f ≤ dimension K := by
   unfold dimension at *
   unfold face at h
   have le: Finset.card f ≤ Finset.card K
@@ -243,7 +283,7 @@ lemma face_dim_le {V : Type _} (K : Simplex V) (f : Simplex V) (h: face K f): di
   exact le_imp_pred_le le
 
 -- lemma(dimension of a proper face is strictly less than the dim of simplex)
-lemma proper_face_dim_lt {V : Type _} (K : Simplex V) (f : Simplex V) {non_empty : toFinset.coe f ≠ (∅:Finset V)} (h: proper_face K f): dimension f < dimension K := by
+lemma proper_face_dim_lt {α : Type _} (K : Simplex α) (f : Simplex α) {non_empty : toFinset.coe f ≠ (∅:Finset α)} (h: proper_face K f): dimension f < dimension K := by
   unfold dimension at *
   unfold proper_face at h
   have lt: Finset.card f < Finset.card K
@@ -260,7 +300,7 @@ lemma proper_face_dim_lt {V : Type _} (K : Simplex V) (f : Simplex V) {non_empty
   exact non_empty
 
 -- lemma(total num of faces of a simplex is 2^(n+1))
-lemma num_faces_of_simplex {V : Type _} (K : Simplex V) {non_empty : toFinset.coe K ≠ (∅:Finset V)} :
+lemma num_faces_of_simplex {α : Type _} (K : Simplex α) {non_empty : toFinset.coe K ≠ (∅:Finset α)} :
   Finset.card (all_faces K) = 2^(dimension K + 1) := by
   simp [dimension]
   rw [← Nat.succ_eq_add_one, Nat.succ_pred]
@@ -268,7 +308,7 @@ lemma num_faces_of_simplex {V : Type _} (K : Simplex V) {non_empty : toFinset.co
   exact non_empty
 
 -- lemma(total num of faces of dim i of a simplex is (n+1) choose (i+1))
-lemma num_faces_of_simplex_dim_i {V : Type _} (K : Simplex V) {h : toFinset.coe K ≠ (∅:Finset V)} (i : ℕ) : 
+lemma num_faces_of_simplex_dim_i {α : Type _} (K : Simplex α) {h : toFinset.coe K ≠ (∅:Finset α)} (i : ℕ) : 
   Finset.card (all_faces_of_dim_i K i) = Nat.choose (dimension K + 1) (i+1) :=  by
   simp?
   simp [dimension]
@@ -277,22 +317,21 @@ lemma num_faces_of_simplex_dim_i {V : Type _} (K : Simplex V) {h : toFinset.coe 
   exact h
 
 
-
+-- def(vertices of a complex)
+@[simp]
+def vertices {α: Type _} (X : Set (Finset α)) : Set α := ⋃ K∈X, K
 
 -- def(AbsSC) : a collection of simplexes
-
-class AbstractSimplicialCplx (V: Type _) where
-  X : Set (Finset V)
-  singletonInclusion : ∀ (p:V), (p ∈ (⋃ K∈X, K)) → ({p} ∈ X)  -- (⋃ K∈X, K) is the set of vertices
+class AbstractSimplicialCplx {α: Type _} (X : Set (Finset α)) where
+  singletonInclusion : ∀ (p:α), (p ∈ (vertices X)) → ({p} ∈ X)  -- (⋃ K∈X, K) is the set of vertices
   noEmpty : ∅ ∉ X
-  FaceInclusion : ∀ K ∈ X, ∀ (K' : Finset V),(K'≠ ∅)∧(face K K') → K' ∈ X
+  FaceInclusion : ∀ K ∈ X, ∀ (K' : Finset α),(K'≠ ∅)∧(face K K') → K' ∈ X
 
 -- example_3 (AbstractSimplicalCplx) real line
 def Lℤ : Set (Finset ℤ) := {{n,n+1} | n : ℤ}∪{{n}| n: ℤ}-- ∪{⟨∅⟩}
 #check Lℤ 
 
-instance realline : AbstractSimplicialCplx ℤ where
-  X := Lℤ 
+instance realline : AbstractSimplicialCplx Lℤ where
   singletonInclusion := 
     (by
       intro p
@@ -333,12 +372,13 @@ instance realline : AbstractSimplicialCplx ℤ where
 -- end of example_3
 
 -- lemma(simplex as simplicial complex)
-instance simplex_as_cplx {V : Type _} (K : Simplex V) : AbstractSimplicialCplx V where
-  X := (all_faces K)\{∅}
+@[simp]
+def simplex_as_cplx {α : Type _} (K : Simplex α) := ((all_faces K).toSet)\{∅}
+
+instance simplex_as_complex : AbstractSimplicialCplx (simplex_as_cplx K) where
   singletonInclusion := 
     (by
       intro p
-      unfold all_faces
       simp
       intro x xK _ px
       apply xK
@@ -360,12 +400,11 @@ instance simplex_as_cplx {V : Type _} (K : Simplex V) : AbstractSimplicialCplx V
 
 
 -- def(skeleton) : a collection of simplexes
-def nskeleton {V : Type _} (X : AbstractSimplicialCplx V) (n : ℕ) : Set (Simplex V)
-  := {K | (K∈ X.X)∧(dimension K ≤ n)}
+def nskeleton {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (n : ℕ) : Set (Simplex α)
+  := {K : Simplex α | (K ∈ X)∧(dimension K ≤ n)}
 
 -- lemma(n-skeleton is a simplicial complex)
-instance n_skeleton {V : Type _} (X : AbstractSimplicialCplx V) (n : ℕ) :  AbstractSimplicialCplx V where
-  X := nskeleton X n 
+instance n_skeleton {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (n : ℕ) :  AbstractSimplicialCplx (nskeleton X n) where
   singletonInclusion := 
     (by
       intro p
@@ -373,14 +412,15 @@ instance n_skeleton {V : Type _} (X : AbstractSimplicialCplx V) (n : ℕ) :  Abs
       simp
       rintro x ⟨xas,_⟩ px
       constructor
-      · exact X.singletonInclusion p (by simp; use x)
+      · -- exact X.singletonInclusion p (by simp; use x)
+        exact AbstractSimplicialCplx.singletonInclusion p (by simp; use x)
       · simp [dimension]
     )
   noEmpty := 
     (by
       unfold nskeleton
       rintro ⟨sc,_⟩
-      exact X.noEmpty sc
+      exact AbstractSimplicialCplx.noEmpty sc
     )
   FaceInclusion :=
     (by
@@ -390,14 +430,14 @@ instance n_skeleton {V : Type _} (X : AbstractSimplicialCplx V) (n : ℕ) :  Abs
       simp at *
       intro K' no_empty fK
       constructor
-      · exact (X.FaceInclusion K asc K' ⟨no_empty,fK⟩)
+      · exact (AbstractSimplicialCplx.FaceInclusion K asc K' ⟨no_empty,fK⟩)
       · linarith [face_dim_le K K' fK, dim]
     )
 
 
 -- def(corresponding simple graph for 1-skeleton)
-instance one_skeleton_as_graph {V:Type _} [DecidableEq V] (X: AbstractSimplicialCplx V) : SimpleGraph V where
-  Adj := fun (x:V) (y:V) ↦ if _ : x ≠ y then {x,y} ∈ (n_skeleton X 1).X else false
+instance one_skeleton_as_graph {α : Type _} (X: Set (Finset α)) [DecidableEq α] {hX : AbstractSimplicialCplx X} : SimpleGraph α where
+  Adj := fun (x : α) (y : α) ↦ if _ : x ≠ y then ({x,y}:Finset α) ∈ (nskeleton X 1) else false
   -- 2 vertices are adjacent iff there is an 1-simplex in the 1-skeleton
   symm := 
     (by
@@ -407,7 +447,7 @@ instance one_skeleton_as_graph {V:Type _} [DecidableEq V] (X: AbstractSimplicial
       · intro eq
         apply neq
         rw [eq]
-      · have ha : ({x,y}:Finset V) = ({y,x}:Finset V) := by
+      · have ha : ({x,y}:Finset α) = ({y,x}:Finset α) := by
           ext z
           simp
           constructor
@@ -428,7 +468,7 @@ instance one_skeleton_as_graph {V:Type _} [DecidableEq V] (X: AbstractSimplicial
     )
 
 -- lemma(1-skeleton of a simplex is a full graph)
-lemma one_skeleton_of_simplex_is_clique {V : Type _} [DecidableEq V] (K : Simplex V): (one_skeleton_as_graph (simplex_as_cplx K)).IsClique (toFinset.coe K) := by
+lemma one_skeleton_of_simplex_is_clique {α : Type _} [DecidableEq α] (K : Simplex α) [h : AbstractSimplicialCplx (simplex_as_cplx K)] : (@one_skeleton_as_graph _ (simplex_as_cplx K) _ h).IsClique (toFinset.coe K) := by
   rw [SimpleGraph.isClique_iff]
   -- clique iff any pair of vertices are connected
   unfold Set.Pairwise
@@ -437,49 +477,54 @@ lemma one_skeleton_of_simplex_is_clique {V : Type _} [DecidableEq V] (K : Simple
   unfold SimpleGraph.Adj
 
   -- {x,y} is in the complex K
-  have h : {x,y}∈ (simplex_as_cplx K).X
-  · unfold simplex_as_cplx
-    simp
-    intro z
-    simp
-    rintro (zx|zy)
-    · rw [zx]; exact xK
-    · rw [zy]; exact yK
+  -- have h1 : {x,y} ∈ (simplex_as_cplx K)
+  -- · unfold simplex_as_cplx
+  --   simp
+  --   intro z
+  --   simp
+  --   rintro (zx|zy)
+  --   · rw [zx]; exact xK
+  --   · rw [zy]; exact yK
 
   -- {x,y} belongs to nskeleton K 1 iff {x,y} in complex K and of dimension less than 1
-  have h : {x,y} ∈ (n_skeleton (simplex_as_cplx K) 1).X
-  · unfold n_skeleton
+  have h2 : ({x,y}:Finset α)  ∈ (nskeleton (simplex_as_cplx K) 1)
+  · unfold nskeleton
     simp
-    unfold nskeleton
     constructor
-    · exact h          -- {x,y} in complex K
+    · constructor     -- {x,y} in complex K
+      · intro z hz
+        simp at hz
+        rcases hz with (zx|zy)
+        · rw [zx]; exact xK
+        · rw [zy]; exact yK 
+      · intro nop
+        rw [Finset.ext_iff] at nop 
+        simp at nop
     · unfold dimension -- of dimension less than 1
       simp [xyne]
   unfold one_skeleton_as_graph
   simp
   constructor
   · exact xyne
-  · exact h
+  · exact h2
 
 
 
 
 -- def(maximum element) : 1. It is an element 2. it is maximal
 @[simp]
-def max_elem {V : Type _} (X : AbstractSimplicialCplx V) (M : Simplex V) : Prop 
+def max_elem {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (M : Simplex α) : Prop 
 --  := (K∈X.X) ∧ (∀ K'∈ X.X, (face K K') → false)
-  := (M∈X.X) ∧ (∀ K ∈ X.X, (face K M) → K=M)  -- since in def(face) itself is included
+  := (M ∈ X) ∧ (∀ K ∈ X, (face K M) → K=M)  -- since in def(face) itself is included
 
 -- def(free face) : a proper face of a unique simplex (in fact, maximal) in complex
-def free_face {V : Type _} (X : AbstractSimplicialCplx V) (f : Simplex V) : Prop
+def free_face {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (f : Simplex α) : Prop
   -- := (∃ K' ∈ X.X, face K K')∧(∃ K'∈ X.X, ∀ K'' ∈ X.X, (face K K')∧(face K K'') → (K'=K'')) 
-  := (f∈X.X) ∧ (∃ M ∈ X.X, proper_face M f) ∧ (∀ M ∈ X.X, ∀ M' ∈ X.X, (proper_face M f)∧(proper_face M' f) → (M=M')) 
-
-
+  := (f ∈ X) ∧ (∃ M ∈ X, proper_face M f) ∧ (∀ M ∈ X, ∀ M' ∈ X, (proper_face M f)∧(proper_face M' f) → (M=M')) 
 
 
 -- example_4 (maximal & free face)
-example : max_elem realline edge12 := by -- {1,2} is a maximal element in realline
+example : max_elem Lℤ edge12 := by -- {1,2} is a maximal element in realline
   unfold realline
   unfold Lℤ 
   simp
@@ -511,7 +556,7 @@ example : max_elem realline edge12 := by -- {1,2} is a maximal element in realli
       · exact Finset.card_le_of_subset feK
       simp at this
 
-example : ∀ K ∈ Lℤ, (free_face realline K) → false := by -- example that realline has no free faces
+example : ∀ K ∈ Lℤ, (free_face Lℤ K) → false := by -- example that realline has no free faces
   /-
     idea of proof:
     assume it have a free face, say f, then show that it is properly contains
@@ -526,8 +571,6 @@ example : ∀ K ∈ Lℤ, (free_face realline K) → false := by -- example that
   · -- assume free face is of form {n,n+1}
     -- which we will get contradiction, since it is not a proper face of anyone
     rcases hK1 with ⟨n, K1⟩ 
-    unfold realline at hK'
-    simp at hK'
     unfold Lℤ at hK'
     have dimlt: dimension K < dimension K' 
     · rw [← proper_face] at fK'K
@@ -545,14 +588,12 @@ example : ∀ K ∈ Lℤ, (free_face realline K) → false := by -- example that
     -- then it is contained in {n,n+1} and {(n-1),(n-1)+1}, which are different
     rcases hK2 with ⟨n, K2⟩ 
 
-    have hM : {n,n+1} ∈ realline.X
-    · unfold realline
-      unfold Lℤ
+    have hM : {n,n+1} ∈ Lℤ
+    · unfold Lℤ
       simp
 
-    have hM' : {(n-1),(n-1)+1}∈ realline.X
-    · unfold realline
-      unfold Lℤ
+    have hM' : {(n-1),(n-1)+1}∈ Lℤ
+    · unfold Lℤ
       simp
       left
       use n-1
@@ -595,8 +636,8 @@ example : ∀ K ∈ Lℤ, (free_face realline K) → false := by -- example that
 
 
 -- lemma(free face is a proper face of a unique maximal elem) if a free face is a proper face of simplex K, K is a maximal elem
-lemma unique_simplex_is_maximal {V : Type _} (X : AbstractSimplicialCplx V) (f : Simplex V)
-  : (free_face X f) → (∀ K ∈ X.X, proper_face K f → max_elem X K) := by
+lemma unique_simplex_is_maximal {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (f : Simplex α)
+  : (free_face X f) → (∀ K ∈ X, proper_face K f → max_elem X K) := by
   intro fXf K hK ffK
   simp
   constructor
@@ -611,8 +652,8 @@ lemma unique_simplex_is_maximal {V : Type _} (X : AbstractSimplicialCplx V) (f :
     exact heq K' hK' K hK ⟨ffK', ffK⟩ 
 
 -- lemma(an equivalent def of free face using maximal elem)
-lemma free_face_max_elem  {V : Type _} (X : AbstractSimplicialCplx V) (K : Simplex V) {non_empty : K ≠ (∅:Finset V) } :
-  free_face X K ↔ ∃ M ∈ X.X, (max_elem X M)∧(proper_face M K)∧(∀ M'∈ X.X,(proper_face M' K)→(M=M') ) := by
+lemma free_face_max_elem  {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (K : Simplex α) {non_empty : K ≠ (∅:Finset α) } :
+  free_face X K ↔ ∃ M ∈ X, (max_elem X M)∧(proper_face M K)∧(∀ M'∈ X,(proper_face M' K)→(M=M') ) := by
   constructor
   · -- direction ->
     intro ffXK
@@ -642,7 +683,7 @@ lemma free_face_max_elem  {V : Type _} (X : AbstractSimplicialCplx V) (K : Simpl
     rcases maxM with ⟨_,⟨fKM,hM'⟩⟩
     unfold free_face
     constructor
-    · exact X.FaceInclusion M hM K ⟨non_empty, fKM.1⟩ -- M is in the cplx
+    · exact AbstractSimplicialCplx.FaceInclusion M hM K ⟨non_empty, fKM.1⟩ -- M is in the cplx
     . constructor
       · use M                               -- proper face
         exact ⟨hM,fKM⟩
@@ -657,18 +698,17 @@ lemma free_face_max_elem  {V : Type _} (X : AbstractSimplicialCplx V) (K : Simpl
         rw [← eqMM1,← eqMM1']
 
 -- lemma(maximal elem itself, viewed as cplx is a subcplx)
-lemma max_elem_is_subsimplicial_cplx {V : Type _} (X : AbstractSimplicialCplx V) (K : Simplex V) (h : max_elem X K) : 
-  (simplex_as_cplx K).X ⊆ X.X := by
+lemma max_elem_is_subsimplicial_cplx {α : Type _} (X:Set (Finset α)) [AbstractSimplicialCplx X] (K : Simplex α) (h : max_elem X K) : 
+  (simplex_as_cplx K) ⊆ X := by
+  unfold simplex_as_cplx
+  intro f hf
   simp at *
   rcases h with ⟨hK,_⟩
-  intro f hf
-  unfold simplex_as_cplx at hf
-  simp at hf
-  exact X.FaceInclusion K hK f (by simp [hf]) 
+  exact AbstractSimplicialCplx.FaceInclusion K hK f (by simp [hf]) 
 
 -- lemma(given free face exists, the codim between it and maximal elem is 1)
-lemma free_face_codim_one {V : Type _} [DecidableEq V] (X : AbstractSimplicialCplx V) (K : Finset V) (h : free_face X K) {non_empty : K≠(∅:Finset V)}
-  : ∀ K'∈ X.X, (proper_face K' K) → dimension K'=dimension K + 1 := by
+lemma free_face_codim_one {α : Type _} [DecidableEq α] (X:Set (Finset α)) [AbstractSimplicialCplx X] (K : Finset α) (h : free_face X K) {non_empty : K≠(∅:Finset α)}
+  : ∀ K'∈ X, (proper_face K' K) → dimension K'=dimension K + 1 := by
   /-
     idea of the proof
     if 2 or more dimension less, the difference of sets is of 2 or more card,
@@ -714,22 +754,22 @@ lemma free_face_codim_one {V : Type _} [DecidableEq V] (X : AbstractSimplicialCp
     simp at ha hb
 
     -- 1st simplex for counter example K∪{a}
-    have hKa : (K∪{a} : Finset V) ∈ X.X
-    · have fKaK' : (K∪{a} : Finset V) ⊆ K'
+    have hKa : (K∪{a} : Finset α) ∈ X
+    · have fKaK' : (K∪{a} : Finset α) ⊆ K'
       · rintro x hx
         simp at hx
         rcases hx with (xK|xa)
         · exact fK'K.1 xK
         · rw [xa]
           exact ha.1
-      have Ka_non_empty : (K∪{a} : Finset V) ≠ ∅ 
+      have Ka_non_empty : (K∪{a} : Finset α) ≠ ∅ 
       · intro emp
         rw [Finset.eq_empty_iff_forall_not_mem] at emp
         simp at emp
         exact emp a (by right; rfl)
-      exact X.FaceInclusion K' hK' (K∪{a} : Finset V) ⟨Ka_non_empty, fKaK'⟩
+      exact AbstractSimplicialCplx.FaceInclusion K' hK' (K∪{a} : Finset α) ⟨Ka_non_empty, fKaK'⟩
     
-    have fKaK : (K:Finset V) ⊂ ((K:Finset V)∪({a}:Finset V))
+    have fKaK : (K:Finset α) ⊂ ((K:Finset α)∪({a}:Finset α))
     · constructor
       · intro x xK
         simp
@@ -740,22 +780,22 @@ lemma free_face_codim_one {V : Type _} [DecidableEq V] (X : AbstractSimplicialCp
         exact ha.2
         
     -- 2st simplex for counter example K∪{b}
-    have hKb : (K∪{b} : Finset V) ∈ X.X
-    · have fKbK' : (K∪{b} : Finset V) ⊆ K'
+    have hKb : (K∪{b} : Finset α) ∈ X
+    · have fKbK' : (K∪{b} : Finset α) ⊆ K'
       · rintro x hx
         simp at hx
         rcases hx with (xK|xb)
         · exact fK'K.1 xK
         · rw [xb]
           exact hb.1
-      have Kb_non_empty : (K∪{b} : Finset V) ≠ ∅ 
+      have Kb_non_empty : (K∪{b} : Finset α) ≠ ∅ 
       · intro emp
         rw [Finset.eq_empty_iff_forall_not_mem] at emp
         simp at emp
         exact emp b (by right; rfl)
-      exact X.FaceInclusion K' hK' (K∪{b} : Finset V) ⟨Kb_non_empty, fKbK'⟩
+      exact AbstractSimplicialCplx.FaceInclusion K' hK' (K∪{b} : Finset α) ⟨Kb_non_empty, fKbK'⟩
 
-    have fKbK : (K:Finset V) ⊂ ((K:Finset V)∪({b}:Finset V))
+    have fKbK : (K:Finset α) ⊂ ((K:Finset α)∪({b}:Finset α))
     · constructor
       · intro x xK
         simp
@@ -766,7 +806,7 @@ lemma free_face_codim_one {V : Type _} [DecidableEq V] (X : AbstractSimplicialCp
         exact hb.2
 
     -- proving that they are different simplex thus not unique
-    have KaKb_neq : (K∪{a} : Finset V)≠(K∪{b} : Finset V)
+    have KaKb_neq : (K∪{a} : Finset α)≠(K∪{b} : Finset α)
     · simp
       rw [Finset.ext_iff]
       simp
@@ -778,7 +818,7 @@ lemma free_face_codim_one {V : Type _} [DecidableEq V] (X : AbstractSimplicialCp
       · exact ab_neq ab_eq
 
     -- using the counter example to construct false
-    specialize h (K∪{a} : Finset V) hKa (K∪{b} : Finset V) hKb
+    specialize h (K∪{a} : Finset α) hKa (K∪{b} : Finset α) hKb
     simp at h
     specialize h fKaK fKbK
     exact KaKb_neq h
