@@ -23,7 +23,7 @@ Todo :
 
   **theorems**
   - dimension of a face is $\le$ dimension of simplex
-  - dimension of a face is $\lt$ dimension of simplex
+  - dimension of a proper face is $\lt$ dimension of simplex
   - \# of faces of an n-dim simplex is $2^{(n+1)}$
   - \# of faces of dimesion i of an n-dim simplex is $(^{n+1}_{i+1})$
  
