@@ -119,28 +119,6 @@ theorem le_imp_pred_le {x y:ℕ} : x ≤ y → x.pred ≤ y.pred := by
   · rw [Nat.succ_pred] -- If y>0, usual case in math
     simp
     exact z
-    
-/-
-statement : {x,y}≠∅ 
-used in : not used
-Remark: having it because of meta Type used and Lean can't do it automatically
--/
-theorem two_set_non_empty {α : Type _} (x y : α) {xyneq : x ≠ y}: (⟨{x,y},(by simp [xyneq])⟩ :Finset α) ≠ ∅ := by
-  intro h
-  have eq_card: Finset.card ⟨{x,y},(by simp [xyneq])⟩ = Finset.card ∅
-  · rw [h]
-  simp at eq_card
-
-/-
-statement : {x,y}≠{a}
-used in : example::(no free face in realline) when proving {n}⊂{n,n+1} (used implicitly)
-Remark: having it because of meta Type used and Lean can't do it automatically
--/
-theorem two_set_non_singleton {α : Type _} (x y : α) {xyneq : x ≠ y}: ∀ (a:α), (⟨{x,y},(by simp [xyneq])⟩ :Finset α) ≠ ({a}:Finset α):= by
-  intro a h
-  have eq_card: Finset.card ⟨{x,y},(by simp [xyneq])⟩ = Finset.card {a}
-  · rw [h]
-  simp at eq_card
 
 /-
 statement : ⊂ + ⊆ => ⊂  
@@ -475,16 +453,6 @@ lemma one_skeleton_of_simplex_is_clique {α : Type _} [DecidableEq α] (K : Simp
   intro x xK y yK xyne 
   simp
   unfold SimpleGraph.Adj
-
-  -- {x,y} is in the complex K
-  -- have h1 : {x,y} ∈ (simplex_as_cplx K)
-  -- · unfold simplex_as_cplx
-  --   simp
-  --   intro z
-  --   simp
-  --   rintro (zx|zy)
-  --   · rw [zx]; exact xK
-  --   · rw [zy]; exact yK
 
   -- {x,y} belongs to nskeleton K 1 iff {x,y} in complex K and of dimension less than 1
   have h2 : ({x,y}:Finset α)  ∈ (nskeleton (simplex_as_cplx K) 1)
