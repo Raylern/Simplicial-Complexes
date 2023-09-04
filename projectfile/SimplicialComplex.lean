@@ -1,9 +1,9 @@
 /-
 Copyright (c) 2023 Summer Project Team 6, 2023 Technion   All rights reserved
 Released under MIT license as described in the file LICENSE.
-Authors: Ray Zhan, Suraj K.
+Authors: Yuyi Dai, Jiao Huang, Suraj Krishna, Ziqi Wang, Ray Zhan 
 
-! This file contains 2 part, one was implemented by 2023 Summer Project Team 6 originally, 
+! This file contains 2 parts, one was implemented by 2023 Technion Summer Project Team 6 originally, 
 ! and another one was ported from Lean 3 material written by ....
 ! leanprover-community/mathlib commit <not-yet there>
 ! Please do not edit these lines, except to modify the commit id
